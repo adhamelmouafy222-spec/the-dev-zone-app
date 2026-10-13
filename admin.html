@@ -55,6 +55,35 @@
         th, td { padding: 12px 14px; border-bottom: 1px solid var(--card-border); font-size: 13px; }
         th { color: var(--text-muted); background: rgba(0,0,0,0.3); }
         .btn-del { background: rgba(255, 71, 87, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+        /* ستايل كروت مهام الأعضاء المنفصلة */
+        .member-task-card {
+            background: rgba(3, 8, 2, 0.9);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+        .member-task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(180, 255, 59, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .member-task-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(14, 25, 12, 0.7);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-right: 3px solid var(--accent-neon);
+        }
     </style>
 </head>
 <body>
@@ -83,7 +112,7 @@
 
         <div class="container">
             <div class="grid-2">
-                <!-- 1. نشر الإشعار وحفظه في السجل + زر الواتساب -->
+                <!-- 1. نشر الإشعار وحفظه في السجل -->
                 <div class="card">
                     <div class="card-title"><i class="fa-solid fa-bullhorn"></i> نشر إشعار وتنبيه جديد للتيم</div>
                     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">سيتم حفظه في سجل الإعلانات الدائم ولن يختفي:</p>
@@ -95,7 +124,7 @@
                     </div>
                 </div>
 
-                <!-- 2. إسناد تاسك لشخص واختيار رقمه بنقرة واحدة -->
+                <!-- 2. إسناد تاسك لعضو محدد -->
                 <div class="card">
                     <div class="card-title"><i class="fa-solid fa-user-tag"></i> إسناد تاسك لعضو محدد</div>
                     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">اختر العضو المسجل من القائمة لملء بياناته تلقائياً:</p>
@@ -112,7 +141,7 @@
                 </div>
             </div>
 
-            <!-- سجل الإعلانات القديمة وإدارتها -->
+            <!-- سجل الإعلانات -->
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> سجل الإعلانات والتنبيهات السابقة (Feed History)</div>
                 <div style="overflow-x: auto;">
@@ -130,9 +159,18 @@
                 </div>
             </div>
 
-            <!-- جدول الحضور الشامل بالتفصيل الأسبوعي والشهري -->
+            <!-- كروت التاسكات المنفصلة لكل عضو -->
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-calendar-check"></i> سجل حضور التيم المباشر (تفاصيل الأيام والشهور)</div>
+                <div class="card-title"><i class="fa-solid fa-tasks"></i> مهام الأعضاء (خانه ومساحة خاصة لكل عضو)</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">كل عضو معروض في صندوق منفصل بكامل تاسكاته وحالتها:</p>
+                <div id="membersTasksContainer">
+                    <p style="color: var(--text-muted); text-align: center; padding: 15px;">جاري تحميل المهام...</p>
+                </div>
+            </div>
+
+            <!-- جدول الحضور الشامل (يوم بيومه بدون تكرار) -->
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-calendar-check"></i> سجل حضور التيم المباشر (مرة واحدة لكل عضو يومياً)</div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -141,29 +179,11 @@
                                 <th>رقم الموبايل</th>
                                 <th>اليوم</th>
                                 <th>التاريخ والشهر</th>
-                                <th>وقت الدخول</th>
+                                <th>وقت أول تسجيل</th>
                                 <th>إجراء</th>
                             </tr>
                         </thead>
                         <tbody id="attendanceAdminTbody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- متابعة حالة التاسكات -->
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-tasks"></i> حالة المهام والتكليفات الموزعة</div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>إيميل العضو</th>
-                                <th>المهمة</th>
-                                <th>الحالة</th>
-                                <th>إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tasksAdminTbody"></tbody>
                     </table>
                 </div>
             </div>
@@ -200,7 +220,7 @@
         }
 
         function startAdminSync() {
-            // تحميل قائمة الأعضاء في القائمة المنسدلة
+            // تحميل الأعضاء في القائمة المنسدلة
             db.ref('team_members').on('value', snap => {
                 const members = snap.val();
                 const sel = document.getElementById('selectMember');
@@ -239,7 +259,7 @@
                 }
             });
 
-            // الحضور الشامل بالتفصيل الأسبوعي والشهري
+            // الحضور الشامل
             db.ref('attendance_logs').on('value', snap => {
                 const logs = snap.val();
                 const tbody = document.getElementById('attendanceAdminTbody');
@@ -263,26 +283,64 @@
                 }
             });
 
-            // المهام
+            // تجميع المهام وعرضها كروت منفصلة لكل عضو
             db.ref('tasks').on('value', snap => {
                 const tasks = snap.val();
-                const tbody = document.getElementById('tasksAdminTbody');
-                tbody.innerHTML = '';
-                if (tasks) {
-                    Object.keys(tasks).reverse().forEach(key => {
-                        const t = tasks[key];
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td style="color: var(--accent-neon);">${t.targetEmail}</td>
-                            <td>${t.text}</td>
-                            <td>${t.done ? '<span style="color: var(--accent-neon);"><i class="fa-solid fa-circle-check"></i> أنجزها</span>' : '<span style="color: #ff9f43;"><i class="fa-solid fa-hourglass"></i> جاري العمل</span>'}</td>
-                            <td><button onclick="db.ref('tasks/${key}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i> حذف</button></td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align:center;">مفيش مهام</td></tr>';
+                const container = document.getElementById('membersTasksContainer');
+                container.innerHTML = '';
+
+                if (!tasks) {
+                    container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:15px;">لا توجد أي مهام مسجلة حالياً.</p>';
+                    return;
                 }
+
+                // تجميع المهام حسب إيميل كل عضو
+                const grouped = {};
+                Object.keys(tasks).forEach(key => {
+                    const t = tasks[key];
+                    const email = t.targetEmail;
+                    if (!grouped[email]) grouped[email] = [];
+                    grouped[email].push({ id: key, ...t });
+                });
+
+                Object.keys(grouped).forEach(email => {
+                    const userTasks = grouped[email];
+                    const doneCount = userTasks.filter(t => t.done).length;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'member-task-card';
+
+                    let tasksRowsHtml = '';
+                    userTasks.forEach(task => {
+                        tasksRowsHtml += `
+                            <div class="member-task-row">
+                                <div>
+                                    <span style="font-weight:600; font-size:14px;">${task.text}</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    ${task.done ? '<span style="color:var(--accent-neon); font-size:12px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> تم الإنجاز</span>' : '<span style="color:#ff9f43; font-size:12px;"><i class="fa-solid fa-hourglass-half"></i> قيد التنفيذ</span>'}
+                                    <button onclick="db.ref('tasks/${task.id}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="member-task-card-header">
+                            <div>
+                                <h4 style="color:#fff; font-size:16px;"><i class="fa-solid fa-user-circle" style="color:var(--accent-neon);"></i> ${email}</h4>
+                            </div>
+                            <div>
+                                <span style="background:rgba(180,255,59,0.15); color:var(--accent-neon); border:1px solid var(--card-border); padding:4px 10px; border-radius:12px; font-size:12px; font-weight:700;">
+                                    منجز: ${doneCount} من ${userTasks.length}
+                                </span>
+                            </div>
+                        </div>
+                        <div>${tasksRowsHtml}</div>
+                    `;
+
+                    container.appendChild(card);
+                });
             });
         }
 
