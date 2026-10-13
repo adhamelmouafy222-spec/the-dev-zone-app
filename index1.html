@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dev Zone - تسجيل حضور التيم</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --card-bg: rgba(6, 14, 4, 0.7);
+            --card-hover: rgba(12, 25, 8, 0.88);
+            --accent-neon: #b4ff3b;
+            --neon-glow: rgba(180, 255, 59, 0.55);
+            --text-main: #f4fbf0;
+            --text-muted: #95c777;
+            --border-color: rgba(180, 255, 59, 0.28);
+            --success: #b4ff3b;
+            --danger: #ff4757;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* اللوجو الأصلي في الخلفية كعلامة مائية نيون */
+        .bg-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75vw;
+            max-width: 550px;
+            height: auto;
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+            filter: drop-shadow(0 0 25px var(--neon-glow)) drop-shadow(0 0 50px rgba(180, 255, 59, 0.2));
+            user-select: none;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1100px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            z-index: 1;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .brand-logo-img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px var(--accent-neon));
+        }
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--neon-glow);
+        }
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 15px rgba(180, 255, 59, 0.12);
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4d8000, var(--accent-neon));
+            color: #000;
+            font-weight: 800;
+            box-shadow: 0 0 15px var(--neon-glow);
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 0 20px;
+            z-index: 1;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 0 15px rgba(180, 255, 59, 0.08);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            border-color: var(--accent-neon);
+            box-shadow: 0 0 20px var(--neon-glow);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(180, 255, 59, 0.12);
+            color: var(--accent-neon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 10px rgba(180, 255, 59, 0.2);
+        }
+        .stat-info h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .section-panel {
+            display: none;
+        }
+        .section-panel.active {
+            display: block;
+        }
+        .card-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 0 25px rgba(180, 255, 59, 0.08);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-box:hover {
+            border-color: rgba(180, 255, 59, 0.55);
+            box-shadow: 0 0 30px rgba(180, 255, 59, 0.18);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-neon);
+            text-shadow: 0 0 12px var(--neon-glow);
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(3, 8, 2, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: var(--accent-neon);
+            box-shadow: 0 0 15px var(--neon-glow);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #5b9900, var(--accent-neon));
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 18px rgba(180, 255, 59, 0.4);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 28px rgba(180, 255, 59, 0.8);
+        }
+        .btn-delete {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-delete:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 71, 87, 0.6);
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+        th {
+            background: rgba(3, 8, 2, 0.9);
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(180, 255, 59, 0.12);
+            color: var(--accent-neon);
+            border: 1px solid rgba(180, 255, 59, 0.3);
+            box-shadow: 0 0 10px rgba(180, 255, 59, 0.2);
+        }
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+            margin-top: 15px;
+        }
+        .member-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 15px rgba(180, 255, 59, 0.06);
+        }
+        .member-card:hover {
+            border-color: var(--accent-neon);
+            background: var(--card-hover);
+            box-shadow: 0 0 20px var(--neon-glow);
+        }
+        .member-card-header {
+            cursor: pointer;
+        }
+        .member-card h4 {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .member-card p {
+            font-size: 13px;
+            color: var(--accent-neon);
+            margin-bottom: 10px;
+        }
+        .member-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        .member-badge {
+            font-size: 11px;
+            background: rgba(180, 255, 59, 0.12);
+            color: var(--accent-neon);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(180, 255, 59, 0.22);
+        }
+        .admin-only {
+            display: none !important;
+        }
+        .user-profile-box {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 650px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            .nav-tabs {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- اللوجو الأصلي في الخلفية كعلامة مائية أوتوماتيك -->
+    <img src="logo.png" class="bg-watermark" alt="The Dev Zone Logo Background">
+
+    <header>
+        <div class="brand">
+            <!-- اللوجو الأصلي في الهيدر أوتوماتيك بدون أي رفع -->
+            <img src="logo.png" class="brand-logo-img" alt="The Dev Zone Logo">
+            <div class="brand-text">
+                <h1>The Dev Zone</h1>
+                <p>منظومة تسجيل حضور ومتابعة تيم المشروع</p>
+            </div>
+        </div>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'checkin')"><i class="fa-solid fa-user-check"></i> تسجيل الحضور</button>
+            <button id="btnAdminDash" class="tab-btn admin-only" onclick="switchTab(event, 'dashboard')"><i class="fa-solid fa-chart-line"></i> لوحة التحكم</button>
+            <button id="btnAdminMembers" class="tab-btn admin-only" onclick="switchTab(event, 'members')"><i class="fa-solid fa-users"></i> أعضاء التيم</button>
+            <button id="btnAdminLogin" class="tab-btn" onclick="loginAdmin()"><i class="fa-solid fa-lock"></i> كابينة الأدمن</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- إحصائيات الأدمن -->
+        <div id="adminStatsGrid" class="stats-grid admin-only">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-total-users">0</h3>
+                    <p>إجمالي أعضاء التيم</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-today-attend">0</h3>
+                    <p>حضور النهاردة</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-last-time">--:--</h3>
+                    <p>آخر تسجيل حضور</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب 1: تسجيل الحضور اليومي -->
+        <div id="tab-checkin" class="section-panel active">
+            <div id="checkinFormContainer" style="max-width: 550px; margin: 0 auto;">
+                <div class="card-box">
+                    <div class="card-title"><i class="fa-solid fa-keyboard"></i> تسجيل الحضور اليومي - The Dev Zone</div>
+                    <form id="manualForm" onsubmit="handleManualSubmit(event)">
+                        <div class="form-group">
+                            <label>اسمك ثلاثي</label>
+                            <input type="text" id="inputName" class="form-control" placeholder="اكتب اسمك بالكامل هنا..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>رقم التليفون / الواتساب</label>
+                            <input type="tel" id="inputPhone" class="form-control" placeholder="01xxxxxxxxx" required>
+                        </div>
+                        <button type="submit" class="btn-submit"><i class="fa-solid fa-check-circle"></i> تسجيل الحضور الآن</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- بطاقة تأكيد الحضور الفردي للظهور بعد التسجيل -->
+            <div id="userProfileBox" class="card-box user-profile-box">
+                <div class="card-title" style="color: var(--accent-neon);"><i class="fa-solid fa-circle-check"></i> مرحب بيك في Dev Zone.. تم تسجيل حضورك بنجاح!</div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-user"></i></div>
+                        <div class="stat-info">
+                            <h3 id="profName" style="font-size: 18px;">---</h3>
+                            <p id="profPhone" style="color: var(--accent-neon);">---</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--accent-neon); background: rgba(180, 255, 59, 0.12);"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3 id="profCount">0</h3>
+                            <p>عدد مرات حضورك معانا</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-title" style="font-size: 15px; margin-bottom: 10px;"><i class="fa-solid fa-history"></i> سجل حضورك باليوم والساعة:</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اليوم والتاريخ</th>
+                                <th>الساعة</th>
+                                <th>حالة الحضور</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="resetCheckinView()" class="btn-submit" style="margin-top: 20px; background: var(--card-hover); border: 1px solid var(--border-color); color: #fff;"><i class="fa-solid fa-rotate-right"></i> تسجيل حضور عضو آخر</button>
+            </div>
+        </div>
+
+        <!-- تبويب 2: لوحة تحكم الأدمن -->
+        <div id="tab-dashboard" class="section-panel">
+            <div class="card-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div class="card-title" style="margin: 0;"><i class="fa-solid fa-list-check"></i> سجل حضور التيم بالكامل</div>
+                    <button onclick="exportCSV()" class="tab-btn" style="background: var(--card-hover); border: 1px solid var(--border-color); color: var(--accent-neon);"><i class="fa-solid fa-file-excel"></i> تحميل شيت الإكسيل (Excel)</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم العضو</th>
+                                <th>رقم التليفون</th>
+                                <th>التاريخ والوقت</th>
+                                <th>الحالة</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب 3: أعضاء التيم -->
+        <div id="tab-members" class="section-panel">
+            <div class="card-box">
+                <div class="card-title"><i class="fa-solid fa-address-book"></i> قائمة أعضاء The Dev Zone</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">اضغط على كارت أي عضو لعرض تفاصيل سجل حضوره:</p>
+                
+                <div id="membersContainer" class="members-grid">
+                </div>
+            </div>
+
+            <!-- عرض تفاصيل سجل عضو محدد -->
+            <div id="singleMemberDetailBox" class="card-box" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="card-title" style="margin: 0;"><i class="fa-solid fa-user-tag"></i> ملف حضور العضو: <span id="detailMemberName" style="color: #fff;"></span></div>
+                    <button onclick="closeMemberDetails()" class="tab-btn" style="background: var(--bg-dark);"><i class="fa-solid fa-xmark"></i> إغلاق</button>
+                </div>
+                
+                <p id="detailMemberPhone" style="color: var(--accent-neon); font-size: 14px; margin-bottom: 15px;"></p>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>التاريخ</th>
+                                <th>الساعة</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="singleMemberHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مكتبات Firebase للاتصال المباشر بالسحابة -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkL8BU8_9RfxvphiaKd1pg05dNKHT-yeE",
+            authDomain: "the-dev-zone.firebaseapp.com",
+            databaseURL: "https://the-dev-zone-default-rtdb.firebaseio.com",
+            projectId: "the-dev-zone",
+            storageBucket: "the-dev-zone.firebasestorage.app",
+            messagingSenderId: "748813193113",
+            appId: "1:748813193113:web:ec0b14ba50e98e65e54d08",
+            measurementId: "G-33TDRNDNTL"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let attendanceLogs = [];
+        let membersList = [];
+        let isAdmin = false;
+
+        db.ref('attendance_logs').on('value', snapshot => {
+            const data = snapshot.val();
+            attendanceLogs = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    attendanceLogs.unshift({ id: key, ...data[key] });
+                });
+            }
+            updateStats();
+            if (document.getElementById('tab-dashboard').classList.contains('active')) {
+                renderLogsTable();
+            }
+        });
+
+        db.ref('members_list').on('value', snapshot => {
+            const data = snapshot.val();
+            membersList = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    membersList.push({ id: key, ...data[key] });
+                });
+            }
+            updateStats();
+            if (document.getElementById('tab-members').classList.contains('active')) {
+                renderMembersGrid();
+            }
+        });
+
+        function switchTab(evt, tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active');
+            }
+            document.getElementById('tab-' + tabName).classList.add('active');
+            if (tabName === 'dashboard') {
+                renderLogsTable();
+            } else if (tabName === 'members') {
+                renderMembersGrid();
+            }
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('admin') === 'true') {
+                enableAdminMode();
+            }
+            updateStats();
+        };
+
+        function loginAdmin() {
+            if (isAdmin) {
+                alert('أنت داخل كـ أدمن أصلاً!');
+                return;
+            }
+            const pass = prompt('اكتب باسورد الأدمن:');
+            if (pass === '1234') {
+                enableAdminMode();
+                alert('مرحباً بالأدمن، اتفتحتلك لوحة التحكم!');
+            } else if (pass !== null) {
+                alert('الباسورد غلط!');
+            }
+        }
+
+        function enableAdminMode() {
+            isAdmin = true;
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.classList.remove('admin-only');
+            });
+            document.getElementById('btnAdminLogin').style.display = 'none';
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-users').innerText = membersList.length;
+            const todayStr = new Date().toLocaleDateString('ar-EG');
+            const todayCount = attendanceLogs.filter(log => log.date === todayStr).length;
+            document.getElementById('stat-today-attend').innerText = todayCount;
+            if (attendanceLogs.length > 0) {
+                document.getElementById('stat-last-time').innerText = attendanceLogs[0].time;
+            } else {
+                document.getElementById('stat-last-time').innerText = '--:--';
+            }
+        }
+
+        async function registerAttendance(name, phone) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            const newLog = {
+                name: name,
+                phone: phone,
+                date: dateStr,
+                time: timeStr,
+                timestamp: now.toISOString()
+            };
+
+            try {
+                await db.ref('attendance_logs').push(newLog);
+                const exists = membersList.some(m => m.phone === phone || m.name === name);
+                if (!exists) {
+                    await db.ref('members_list').push({ name: name, phone: phone });
+                }
+                showMemberProfile(name, phone);
+            } catch (err) {
+                alert('حصل خطأ في الاتصال بقاعدة البيانات: ' + err.message);
+            }
+        }
+
+        async function deleteLog(logId) {
+            if (confirm('أكيد عايز تمسح التسجيل ده من السحابة؟')) {
+                await db.ref('attendance_logs/' + logId).remove();
+            }
+        }
+
+        async function deleteMember(memberPhone, memberName, memberId) {
+            if (confirm(`أكيد عايز تمسح بيانات (${memberName}) بالكامل من السيرفر؟`)) {
+                if (memberId) {
+                    await db.ref('members_list/' + memberId).remove();
+                }
+                attendanceLogs.forEach(async log => {
+                    if (log.phone === memberPhone || log.name === memberName) {
+                        await db.ref('attendance_logs/' + log.id).remove();
+                    }
+                });
+                closeMemberDetails();
+            }
+        }
+
+        function showMemberProfile(name, phone) {
+            document.getElementById('checkinFormContainer').style.display = 'none';
+            document.getElementById('userProfileBox').style.display = 'block';
+            document.getElementById('profName').innerText = name;
+            document.getElementById('profPhone').innerText = phone;
+            const userLogs = attendanceLogs.filter(log => log.phone === phone || log.name === name);
+            document.getElementById('profCount').innerText = userLogs.length;
+            const historyTbody = document.getElementById('userHistoryBody');
+            historyTbody.innerHTML = '';
+            userLogs.forEach((log, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color: var(--text-muted);">${userLogs.length - index}</td>
+                    <td>${log.date}</td>
+                    <td>${log.time}</td>
+                    <td><span class="status-badge"><i class="fa-solid fa-circle-check"></i> حاضر</span></td>
+                `;
+                historyTbody.appendChild(tr);
+            });
+        }
+
+        function resetCheckinView() {
+            document.getElementById('userProfileBox').style.display = 'none';
+            document.getElementById('checkinFormContainer').style.display = 'block';
+            document.getElementById('manualForm').reset();
+        }
+
+        function handleManualSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value.trim();
+            const phone = document.getElementById('inputPhone').value.trim();
+            if (name && phone) {
+                registerAttendance(name, phone);
+            }
+        }
+
+        function renderLogsTable() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+            if (attendanceLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding:30px;">مفيش أي تسجيلات حضور لغاية دلوقتي على السيرفر</td></tr>';
+                return;
+            }
+            attendanceLogs.forEach((log, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color: var(--text-muted);">${attendanceLogs.length - index}</td>
+                    <td style="font-weight: 700;">${log.name}</td>
+                    <td style="color: var(--accent-neon);">${log.phone}</td>
+                    <td>${log.date} - ${log.time}</td>
+                    <td><span class="status-badge"><i class="fa-solid fa-circle-check"></i> حاضر</span></td>
+                    <td><button onclick="deleteLog('${log.id}')" class="btn-delete"><i class="fa-solid fa-trash"></i> مسح</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMembersGrid() {
+            const container = document.getElementById('membersContainer');
+            container.innerHTML = '';
+            if (membersList.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">لسه مفيش حد من التيم سجل حضور.</p>';
+                return;
+            }
+            membersList.forEach(member => {
+                const memberLogs = attendanceLogs.filter(log => log.phone === member.phone || log.name === member.name);
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                card.innerHTML = `
+                    <div class="member-card-header" onclick="showSingleMemberDetails('${member.name}', '${member.phone}')">
+                        <h4><i class="fa-solid fa-user-circle" style="color: var(--accent-neon);"></i> ${member.name}</h4>
+                        <p><i class="fa-solid fa-phone"></i> ${member.phone}</p>
+                    </div>
+                    <div class="member-card-footer">
+                        <span class="member-badge">حضور: ${memberLogs.length} مرات</span>
+                        <button onclick="deleteMember('${member.phone}', '${member.name}', '${member.id}')" class="btn-delete"><i class="fa-solid fa-user-minus"></i> حذف العضو</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showSingleMemberDetails(name, phone) {
+            const detailBox = document.getElementById('singleMemberDetailBox');
+            detailBox.style.display = 'block';
+            document.getElementById('detailMemberName').innerText = name;
+            document.getElementById('detailMemberPhone').innerText = 'رقم التليفون: ' + phone;
+            const userLogs = attendanceLogs.filter(log => log.phone === phone || log.name === name);
+            const historyTbody = document.getElementById('singleMemberHistoryBody');
+            historyTbody.innerHTML = '';
+            userLogs.forEach((log, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color: var(--text-muted);">${userLogs.length - index}</td>
+                    <td>${log.date}</td>
+                    <td>${log.time}</td>
+                    <td><span class="status-badge"><i class="fa-solid fa-circle-check"></i> حاضر</span></td>
+                `;
+                historyTbody.appendChild(tr);
+            });
+            detailBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeMemberDetails() {
+            document.getElementById('singleMemberDetailBox').style.display = 'none';
+        }
+
+        function exportCSV() {
+            if (attendanceLogs.length === 0) {
+                alert('مفيش بيانات تترفع للـ Excel لسه!');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "الاسم,رقم التليفون,التاريخ,الوقت\n";
+            attendanceLogs.forEach(log => {
+                csvContent += `"${log.name}","${log.phone}","${log.date}","${log.time}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "The_Dev_Zone_Attendance.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
