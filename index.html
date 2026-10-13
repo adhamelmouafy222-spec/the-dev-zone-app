@@ -51,7 +51,6 @@
 
         .main-container { max-width: 1100px; margin: 25px auto; padding: 0 20px; width: 100%; }
 
-        /* سجل الإشعارات */
         .announcement-box {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -81,12 +80,10 @@
         .task-item.done { opacity: 0.5; text-decoration: line-through; }
         .task-meta { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
 
-        /* جدول الحضور الأسبوعي / الشهري */
         .attendance-table { width: 100%; border-collapse: collapse; text-align: center; }
         .attendance-table th, .attendance-table td { padding: 12px 10px; border-bottom: 1px solid var(--card-border); font-size: 13px; }
         .attendance-table th { color: var(--text-muted); background: rgba(0,0,0,0.3); font-weight: 600; }
         .badge-present { background: rgba(180, 255, 59, 0.15); color: var(--accent-neon); border: 1px solid var(--accent-neon); padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: 700; }
-        .badge-absent { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid rgba(255, 71, 87, 0.3); padding: 4px 10px; border-radius: 15px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -135,7 +132,6 @@
         </header>
 
         <div class="main-container">
-            <!-- صندوق الإشعارات والتنبيهات المستمرة -->
             <div class="announcement-box">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--accent-neon); font-size: 16px; font-weight: 700;">
                     <i class="fa-solid fa-bullhorn"></i> إعلانات وتنبيهات الإدارة (The Dev Zone Feed)
@@ -146,7 +142,6 @@
             </div>
 
             <div class="dashboard-grid">
-                <!-- قسم التاسكات -->
                 <div class="section-card">
                     <div class="section-card-title">
                         <span><i class="fa-solid fa-list-check"></i> تكليفاتي ومهامي</span>
@@ -157,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- جدول الحضور الأسبوعي / الشهري -->
                 <div class="section-card">
                     <div class="section-card-title">
                         <span><i class="fa-solid fa-calendar-days"></i> سجل حضوري ومواعيدي</span>
@@ -221,19 +215,28 @@
             const dayName = now.toLocaleDateString('ar-EG', { weekday: 'long' });
             const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            // معرف اليوم الفريد YYYY-MM-DD
+            const todayKey = now.toISOString().split('T')[0];
 
-            const record = {
-                name: name,
-                email: email,
-                phone: phone,
-                day: dayName,
-                date: dateStr,
-                time: timeStr,
-                rawDate: now.toISOString().split('T')[0],
-                timestamp: now.toISOString()
-            };
+            // التحقق مما إذا كان العضو قد سجل حضور بالفعل اليوم لمنع التكرار
+            const snap = await db.ref('attendance_logs').once('value');
+            const logs = snap.val() || {};
+            const alreadyCheckedIn = Object.values(logs).some(l => l.email === email && l.rawDate === todayKey);
 
-            await db.ref('attendance_logs').push(record);
+            if (!alreadyCheckedIn) {
+                const record = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    day: dayName,
+                    date: dateStr,
+                    time: timeStr,
+                    rawDate: todayKey,
+                    timestamp: now.toISOString()
+                };
+                await db.ref('attendance_logs').push(record);
+            }
+
             await db.ref('team_members/' + email.replace(/\./g, '_')).set({
                 name: name,
                 email: email,
@@ -258,7 +261,6 @@
             listenUserAttendance();
         }
 
-        // عرض قائمة الإعلانات متتالية من الأحدث للأقدم
         function listenAnnouncements() {
             db.ref('announcements_history').on('value', snap => {
                 const list = snap.val();
