@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #080d07;
-            --card-bg: rgba(14, 24, 12, 0.78);
-            --card-border: rgba(180, 255, 59, 0.25);
+            --bg-dark: #070d06;
+            --card-bg: rgba(13, 25, 11, 0.85);
+            --card-border: rgba(180, 255, 59, 0.28);
             --accent-neon: #b4ff3b;
             --neon-glow: rgba(180, 255, 59, 0.45);
             --text-main: #f5fcf0;
@@ -18,7 +18,7 @@
             --danger: #ff4757;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; position: relative; overflow-x: hidden; }
         
         .bg-watermark {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -43,22 +43,50 @@
         .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-glow); }
 
         .app-view { display: none; width: 100%; z-index: 1; }
-        header { width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); background: rgba(8, 13, 7, 0.9); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 10; }
+        header { width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); background: rgba(8, 13, 7, 0.95); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 10; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
         .header-brand img { width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 8px var(--accent-neon)); }
         .user-pill { background: rgba(180, 255, 59, 0.1); border: 1px solid var(--card-border); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--accent-neon); display: flex; align-items: center; gap: 8px; }
         .btn-logout { background: rgba(255, 71, 87, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
 
-        .main-container { max-width: 1000px; margin: 25px auto; padding: 0 20px; width: 100%; }
-        .announcement-bar { background: linear-gradient(90deg, rgba(180, 255, 59, 0.15), rgba(77, 128, 0, 0.2)); border: 1px solid var(--accent-neon); border-radius: 14px; padding: 15px 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 0 20px rgba(180, 255, 59, 0.1); }
-        .announcement-icon { font-size: 24px; color: var(--accent-neon); }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        @media (max-width: 800px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        .main-container { max-width: 1100px; margin: 25px auto; padding: 0 20px; width: 100%; }
+
+        /* سجل الإشعارات */
+        .announcement-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+        }
+        .announcement-item {
+            background: rgba(5, 11, 4, 0.85);
+            border: 1px solid var(--card-border);
+            border-right: 4px solid var(--accent-neon);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+        }
+        .announcement-item p { font-size: 15px; color: #fff; line-height: 1.5; }
+        .announcement-item span { font-size: 11px; color: var(--accent-neon); display: block; margin-top: 6px; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
         .section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); }
         .section-card-title { font-size: 18px; font-weight: 700; color: var(--accent-neon); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
         .task-item { background: rgba(5, 11, 4, 0.85); border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .task-item.done { opacity: 0.5; text-decoration: line-through; }
         .task-meta { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+
+        /* جدول الحضور الأسبوعي / الشهري */
+        .attendance-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .attendance-table th, .attendance-table td { padding: 12px 10px; border-bottom: 1px solid var(--card-border); font-size: 13px; }
+        .attendance-table th { color: var(--text-muted); background: rgba(0,0,0,0.3); font-weight: 600; }
+        .badge-present { background: rgba(180, 255, 59, 0.15); color: var(--accent-neon); border: 1px solid var(--accent-neon); padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: 700; }
+        .badge-absent { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid rgba(255, 71, 87, 0.3); padding: 4px 10px; border-radius: 15px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -68,7 +96,7 @@
     <div id="authScreen" class="auth-container">
         <div class="auth-hero">
             <h1>أهلاً بك في <span>The Dev Zone</span></h1>
-            <p>سجل دخولك اليومي للوصول لمهامك وتكليفاتك الخاصة ومتابعة تنبيهات واجتماعات الفريق لحظة بلحظة.</p>
+            <p>سجل دخولك اليومي للوصول لمهامك وتكليفاتك ومتابعة جدول الحضور الأسبوعي وإشعارات الفريق لحظة بلحظة.</p>
         </div>
         <div class="auth-card">
             <div class="auth-card-header">
@@ -107,15 +135,18 @@
         </header>
 
         <div class="main-container">
-            <div class="announcement-bar">
-                <div class="announcement-icon"><i class="fa-solid fa-bullhorn"></i></div>
-                <div>
-                    <h4 style="color: #fff; font-size: 15px;">إشعار الإدارة:</h4>
-                    <p id="announcementText" style="color: var(--accent-neon); font-size: 14px; margin-top: 3px;">لا توجد تنبيهات جديدة حالياً.</p>
+            <!-- صندوق الإشعارات والتنبيهات المستمرة -->
+            <div class="announcement-box">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--accent-neon); font-size: 16px; font-weight: 700;">
+                    <i class="fa-solid fa-bullhorn"></i> إعلانات وتنبيهات الإدارة (The Dev Zone Feed)
+                </div>
+                <div id="announcementsList">
+                    <p style="color: var(--text-muted); font-size: 13px;">لا توجد إعلانات حالياً.</p>
                 </div>
             </div>
 
             <div class="dashboard-grid">
+                <!-- قسم التاسكات -->
                 <div class="section-card">
                     <div class="section-card-title">
                         <span><i class="fa-solid fa-list-check"></i> تكليفاتي ومهامي</span>
@@ -126,13 +157,26 @@
                     </div>
                 </div>
 
+                <!-- جدول الحضور الأسبوعي / الشهري -->
                 <div class="section-card">
                     <div class="section-card-title">
-                        <span><i class="fa-solid fa-calendar-check"></i> تسجيل حضور اليوم</span>
+                        <span><i class="fa-solid fa-calendar-days"></i> سجل حضوري ومواعيدي</span>
+                        <span id="attendCountBadge" style="font-size: 12px; background: rgba(180, 255, 59, 0.15); padding: 4px 10px; border-radius: 12px;">حضور: 0</span>
                     </div>
-                    <div style="background: rgba(180, 255, 59, 0.08); border: 1px solid var(--card-border); padding: 18px; border-radius: 14px;">
-                        <p style="font-size: 15px; color: #fff;"><i class="fa-solid fa-circle-check" style="color: var(--accent-neon);"></i> تم تسجيل حضورك اليوم بنجاح!</p>
-                        <p id="attendanceTimeLabel" style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">جاري المزامنة...</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">متابعة دقيقة باليوم والتاريخ والساعة:</p>
+                    <div style="overflow-x: auto;">
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>التاريخ</th>
+                                    <th>وقت التسجيل</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userAttendanceTbody">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -155,14 +199,8 @@
         const db = firebase.database();
 
         let currentUser = null;
-        let lastAnnouncement = "";
 
         window.onload = function() {
-            // طلب إذن الإشعارات من المتصفح
-            if ("Notification" in window && Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-
             const saved = localStorage.getItem('tdz_user');
             if (saved) {
                 currentUser = JSON.parse(saved);
@@ -180,17 +218,22 @@
             localStorage.setItem('tdz_user', JSON.stringify(currentUser));
 
             const now = new Date();
+            const dayName = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+            const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
             const record = {
                 name: name,
                 email: email,
                 phone: phone,
-                date: now.toLocaleDateString('ar-EG'),
-                time: now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                day: dayName,
+                date: dateStr,
+                time: timeStr,
+                rawDate: now.toISOString().split('T')[0],
                 timestamp: now.toISOString()
             };
-            await db.ref('attendance_logs').push(record);
 
-            // حفظ بيانات العضو في قاعدة البيانات لتسهيل الوصول إليها
+            await db.ref('attendance_logs').push(record);
             await db.ref('team_members/' + email.replace(/\./g, '_')).set({
                 name: name,
                 email: email,
@@ -209,24 +252,36 @@
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
             document.getElementById('currentUserName').innerText = currentUser.name;
-            document.getElementById('attendanceTimeLabel').innerText = "تم تسجيل حضورك اليوم بنجاح في قاعدة البيانات.";
 
-            // الاستماع للإشعارات وإطلاق تنبيه متصفح في حال صدور إشعار جديد
-            db.ref('system_announcement').on('value', snap => {
-                const val = snap.val();
-                if (val && val.text) {
-                    document.getElementById('announcementText').innerText = val.text;
-                    if (lastAnnouncement && lastAnnouncement !== val.text && Notification.permission === "granted") {
-                        new Notification("The Dev Zone - إشعار جديد", {
-                            body: val.text,
-                            icon: "logo.png"
-                        });
-                    }
-                    lastAnnouncement = val.text;
+            listenAnnouncements();
+            listenUserTasks();
+            listenUserAttendance();
+        }
+
+        // عرض قائمة الإعلانات متتالية من الأحدث للأقدم
+        function listenAnnouncements() {
+            db.ref('announcements_history').on('value', snap => {
+                const list = snap.val();
+                const container = document.getElementById('announcementsList');
+                container.innerHTML = '';
+                if (list) {
+                    Object.keys(list).reverse().forEach(key => {
+                        const item = list[key];
+                        const div = document.createElement('div');
+                        div.className = 'announcement-item';
+                        div.innerHTML = `
+                            <p>${item.text}</p>
+                            <span><i class="fa-regular fa-clock"></i> ${item.day || ''} - ${item.date} (${item.time})</span>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">لا توجد إعلانات سابقة حتى الآن.</p>';
                 }
             });
+        }
 
-            // الاستماع لتاسكات العضو
+        function listenUserTasks() {
             db.ref('tasks').on('value', snap => {
                 const tasks = snap.val();
                 const container = document.getElementById('userTasksContainer');
@@ -260,6 +315,37 @@
 
         async function toggleTask(taskId, status) {
             await db.ref('tasks/' + taskId).update({ done: status });
+        }
+
+        function listenUserAttendance() {
+            db.ref('attendance_logs').on('value', snap => {
+                const logs = snap.val();
+                const tbody = document.getElementById('userAttendanceTbody');
+                tbody.innerHTML = '';
+                let count = 0;
+
+                if (logs) {
+                    Object.keys(logs).reverse().forEach(key => {
+                        const item = logs[key];
+                        if (item.email === currentUser.email) {
+                            count++;
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td style="font-weight: 700; color: #fff;">${item.day || '---'}</td>
+                                <td style="color: var(--accent-neon);">${item.date}</td>
+                                <td>${item.time}</td>
+                                <td><span class="badge-present"><i class="fa-solid fa-check"></i> حاضر</span></td>
+                            `;
+                            tbody.appendChild(tr);
+                        }
+                    });
+                }
+
+                document.getElementById('attendCountBadge').innerText = 'حضور: ' + count + ' أيام';
+                if (count === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="color: var(--text-muted); padding: 15px;">لا توجد تسجيلات حضور سابقة</td></tr>';
+                }
+            });
         }
     </script>
 </body>
