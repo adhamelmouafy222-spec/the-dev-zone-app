@@ -16,6 +16,7 @@
             --text-main: #f5fcf0;
             --text-muted: #8fae85;
             --danger: #ff4757;
+            --wa-green: #25d366;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; position: relative; }
@@ -26,7 +27,6 @@
             filter: drop-shadow(0 0 35px var(--neon-glow));
         }
 
-        /* قفل الأمان للأدمن */
         .lock-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10; position: relative; }
         .lock-box { background: var(--card-bg); border: 1px solid var(--accent-neon); border-radius: 20px; padding: 35px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 30px var(--neon-glow); backdrop-filter: blur(20px); }
         .lock-box img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--accent-neon)); }
@@ -47,6 +47,8 @@
         .form-control:focus { border-color: var(--accent-neon); box-shadow: 0 0 12px var(--neon-glow); }
         .btn-neon { width: 100%; padding: 12px; background: linear-gradient(90deg, #4d8000, var(--accent-neon)); border: none; border-radius: 10px; color: #000; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 0 18px var(--neon-glow); }
+        .btn-wa { background: #128c7e; color: #fff; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); }
+        .btn-wa:hover { background: #25d366; color: #000; }
 
         table { width: 100%; border-collapse: collapse; text-align: right; }
         th, td { padding: 14px; border-bottom: 1px solid var(--card-border); font-size: 14px; }
@@ -80,27 +82,31 @@
 
         <div class="container">
             <div class="grid-2">
-                <!-- 1. إرسال إشعار عام للشباب -->
+                <!-- 1. إرسال إشعار عام للشباب + مشاركة على جروب الواتساب -->
                 <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-bullhorn"></i> نشر إشعار وتنبيه للشباب جميعاً</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">الإشعار ده هيظهر في نفس الثانية في السايت بتاع الشباب فوق:</p>
-                    <input type="text" id="inputAnnouncement" class="form-control" placeholder="اكتب التنبيه (مثلاً: اجتماع بكرة الساعة 5 م)">
-                    <button onclick="publishAnnouncement()" class="btn-neon"><i class="fa-solid fa-paper-plane"></i> نشر الإشعار فوراً</button>
+                    <div class="card-title"><i class="fa-solid fa-bullhorn"></i> نشر إشعار وتنبيه عام للفريق</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">سيظهر فوراً على شريط الموقع لجميع الأعضاء:</p>
+                    <input type="text" id="inputAnnouncement" class="form-control" placeholder="اكتب التنبيه (مثلاً: اجتماع غداً الساعة 6 م)">
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="publishAnnouncement(false)" class="btn-neon" style="flex: 1;"><i class="fa-solid fa-paper-plane"></i> نشر في الموقع فقط</button>
+                        <button onclick="publishAnnouncement(true)" class="btn-neon btn-wa" style="flex: 1;"><i class="fa-brands fa-whatsapp"></i> نشر + إرسال لجروب الواتساب</button>
+                    </div>
                 </div>
 
-                <!-- 2. إسناد تاسك لشخص محدد ومتابعة تنفيذه -->
+                <!-- 2. إسناد تاسك لشخص محدد + إشعار واتساب خاص -->
                 <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-user-tag"></i> تعيين تاسك لشخص محدد فقط</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">التاسك هيظهر عنده هو لوحده فقط لما يسجل بإيميله:</p>
+                    <div class="card-title"><i class="fa-solid fa-user-tag"></i> تعيين تاسك لعضو محدد</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">التاسك يظهر في صفحته + يرسل له تنبيه على الواتساب مباشرة:</p>
                     <input type="email" id="taskEmail" class="form-control" placeholder="إيميل العضو (مثال: ahmed@gmail.com)">
-                    <input type="text" id="taskText" class="form-control" placeholder="المهمة المطلوبة منه بالتفصيل">
-                    <button onclick="assignTask()" class="btn-neon"><i class="fa-solid fa-plus"></i> إرسال التاسك له</button>
+                    <input type="tel" id="taskPhone" class="form-control" placeholder="رقم واتساب العضو (01xxxxxxxxx)">
+                    <input type="text" id="taskText" class="form-control" placeholder="المهمة المطلوبة منه">
+                    <button onclick="assignTaskWithWhatsApp()" class="btn-neon btn-wa"><i class="fa-brands fa-whatsapp"></i> إرسال التاسك + إشعار واتساب للعضو</button>
                 </div>
             </div>
 
-            <!-- 3. جدول مراقبة ومتابعة الشباب المباشر -->
+            <!-- 3. متابعة حالة المهام والتكليفات -->
             <div class="card" style="margin-bottom: 30px;">
-                <div class="card-title"><i class="fa-solid fa-tasks"></i> متابعة حالة المهام والتكليفات (مين خلص ومين لسه)</div>
+                <div class="card-title"><i class="fa-solid fa-tasks"></i> متابعة حالة المهام والتكليفات</div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -125,8 +131,8 @@
                             <tr>
                                 <th>الاسم</th>
                                 <th>البريد الإلكتروني</th>
-                                <th>التاريخ</th>
-                                <th>وقت الدخول</th>
+                                <th>رقم الموبايل</th>
+                                <th>التاريخ والوقت</th>
                                 <th>إجراء</th>
                             </tr>
                         </thead>
@@ -137,7 +143,6 @@
         </div>
     </div>
 
-    <!-- Firebase Connection -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
@@ -153,7 +158,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // باسورد الأدمن السري (تقدر تغيره في أي وقت من هنا)
         const ADMIN_SECRET = "1234";
 
         function checkAdminPass() {
@@ -180,8 +184,8 @@
                         tr.innerHTML = `
                             <td style="font-weight: 700;">${row.name}</td>
                             <td style="color: var(--accent-neon);">${row.email}</td>
-                            <td>${row.date}</td>
-                            <td>${row.time}</td>
+                            <td>${row.phone || '--'}</td>
+                            <td>${row.date} - ${row.time}</td>
                             <td><button onclick="db.ref('attendance_logs/${key}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i> مسح</button></td>
                         `;
                         tbody.appendChild(tr);
@@ -191,7 +195,7 @@
                 }
             });
 
-            // مزامنة المهام والتاسكات لمعرفة مين خلص
+            // مزامنة المهام
             db.ref('tasks').on('value', snap => {
                 const tasks = snap.val();
                 const tbody = document.getElementById('tasksAdminTbody');
@@ -203,7 +207,7 @@
                         tr.innerHTML = `
                             <td style="color: var(--accent-neon); font-weight:600;">${t.targetEmail}</td>
                             <td>${t.text}</td>
-                            <td>${t.done ? '<span style="color: var(--accent-neon);"><i class="fa-solid fa-circle-check"></i> العضو خلصها</span>' : '<span style="color: #ff9f43;"><i class="fa-solid fa-hourglass-half"></i> قيد التنفيذ</span>'}</td>
+                            <td>${t.done ? '<span style="color: var(--accent-neon);"><i class="fa-solid fa-circle-check"></i> العضو أنجزها</span>' : '<span style="color: #ff9f43;"><i class="fa-solid fa-hourglass-half"></i> قيد التنفيذ</span>'}</td>
                             <td><button onclick="db.ref('tasks/${key}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i> حذف</button></td>
                         `;
                         tbody.appendChild(tr);
@@ -214,28 +218,51 @@
             });
         }
 
-        async function publishAnnouncement() {
+        async function publishAnnouncement(openWhatsApp) {
             const val = document.getElementById('inputAnnouncement').value.trim();
-            if (val) {
-                await db.ref('system_announcement').set({ text: val });
-                alert('تم نشر الإشعار في موقع الشباب بنجاح!');
-                document.getElementById('inputAnnouncement').value = '';
+            if (!val) {
+                alert('اكتب نص الإشعار أولاً!');
+                return;
             }
+            await db.ref('system_announcement').set({ text: val });
+            
+            if (openWhatsApp) {
+                const msg = encodeURIComponent(`📢 *تنبيه هام من إدارة The Dev Zone:*\n\n${val}\n\n🔗 لمتابعة التفاصيل وتسجيل الحضور:\nhttps://adhamelmouafy222-spec.github.io/the-dev-zone-app/`);
+                window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
+            } else {
+                alert('تم نشر الإشعار في الموقع بنجاح!');
+            }
+            document.getElementById('inputAnnouncement').value = '';
         }
 
-        async function assignTask() {
+        async function assignTaskWithWhatsApp() {
             const email = document.getElementById('taskEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('taskPhone').value.trim();
             const text = document.getElementById('taskText').value.trim();
-            if (email && text) {
-                await db.ref('tasks').push({
-                    targetEmail: email,
-                    text: text,
-                    done: false,
-                    assignedAt: new Date().toISOString()
-                });
-                alert('تم إرسال التاسك لإيميل ' + email + ' بنجاح!');
-                document.getElementById('taskText').value = '';
+
+            if (!email || !text) {
+                alert('يرجى إدخال إيميل العضو والمهمة!');
+                return;
             }
+
+            await db.ref('tasks').push({
+                targetEmail: email,
+                text: text,
+                done: false,
+                assignedAt: new Date().toISOString()
+            });
+
+            if (phone) {
+                let cleanPhone = phone.replace(/\D/g, '');
+                if (cleanPhone.startsWith('01')) cleanPhone = '2' + cleanPhone;
+                
+                const msg = encodeURIComponent(`سلام عليكم، تم إسناد تكليف جديد لك في The Dev Zone:\n\n📌 *المهمة:* ${text}\n\n🔗 يرجى فتح مساحة العمل وتأكيد التنفيذ فور الانتهاء:\nhttps://adhamelmouafy222-spec.github.io/the-dev-zone-app/`);
+                window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+            } else {
+                alert('تم إرسال التاسك إلى مساحة العضو بنجاح!');
+            }
+
+            document.getElementById('taskText').value = '';
         }
     </script>
 </body>
