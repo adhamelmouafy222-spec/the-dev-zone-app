@@ -84,12 +84,16 @@
                     <label>البريد الإلكتروني (Gmail)</label>
                     <input type="email" id="loginEmail" class="form-control" placeholder="example@gmail.com" required>
                 </div>
+                <div class="form-group">
+                    <label>رقم الواتساب / الموبايل</label>
+                    <input type="tel" id="loginPhone" class="form-control" placeholder="01xxxxxxxxx" required>
+                </div>
                 <button type="submit" class="btn-neon"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول الآن</button>
             </form>
         </div>
     </div>
 
-    <!-- شاشة العمل الخاصة بالعضو -->
+    <!-- شاشة مساحة العمل -->
     <div id="appScreen" class="app-view">
         <header>
             <div class="header-brand">
@@ -103,7 +107,6 @@
         </header>
 
         <div class="main-container">
-            <!-- شريط تنبيهات الأدمن -->
             <div class="announcement-bar">
                 <div class="announcement-icon"><i class="fa-solid fa-bullhorn"></i></div>
                 <div>
@@ -113,7 +116,6 @@
             </div>
 
             <div class="dashboard-grid">
-                <!-- مهام العضو ده فقط -->
                 <div class="section-card">
                     <div class="section-card-title">
                         <span><i class="fa-solid fa-list-check"></i> تكليفاتي ومهامي</span>
@@ -124,7 +126,6 @@
                     </div>
                 </div>
 
-                <!-- إثبات الحضور لليوم -->
                 <div class="section-card">
                     <div class="section-card-title">
                         <span><i class="fa-solid fa-calendar-check"></i> تسجيل حضور اليوم</span>
@@ -138,7 +139,6 @@
         </div>
     </div>
 
-    <!-- Firebase Connection -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
@@ -155,8 +155,14 @@
         const db = firebase.database();
 
         let currentUser = null;
+        let lastAnnouncement = "";
 
         window.onload = function() {
+            // طلب إذن الإشعارات من المتصفح
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+
             const saved = localStorage.getItem('tdz_user');
             if (saved) {
                 currentUser = JSON.parse(saved);
@@ -168,19 +174,29 @@
             e.preventDefault();
             const name = document.getElementById('loginName').value.trim();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('loginPhone').value.trim();
 
-            currentUser = { name, email };
+            currentUser = { name, email, phone };
             localStorage.setItem('tdz_user', JSON.stringify(currentUser));
 
             const now = new Date();
             const record = {
                 name: name,
                 email: email,
+                phone: phone,
                 date: now.toLocaleDateString('ar-EG'),
                 time: now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
                 timestamp: now.toISOString()
             };
             await db.ref('attendance_logs').push(record);
+
+            // حفظ بيانات العضو في قاعدة البيانات لتسهيل الوصول إليها
+            await db.ref('team_members/' + email.replace(/\./g, '_')).set({
+                name: name,
+                email: email,
+                phone: phone
+            });
+
             startApp();
         }
 
@@ -195,13 +211,22 @@
             document.getElementById('currentUserName').innerText = currentUser.name;
             document.getElementById('attendanceTimeLabel').innerText = "تم تسجيل حضورك اليوم بنجاح في قاعدة البيانات.";
 
-            // استماع للإشعارات
+            // الاستماع للإشعارات وإطلاق تنبيه متصفح في حال صدور إشعار جديد
             db.ref('system_announcement').on('value', snap => {
                 const val = snap.val();
-                if (val && val.text) document.getElementById('announcementText').innerText = val.text;
+                if (val && val.text) {
+                    document.getElementById('announcementText').innerText = val.text;
+                    if (lastAnnouncement && lastAnnouncement !== val.text && Notification.permission === "granted") {
+                        new Notification("The Dev Zone - إشعار جديد", {
+                            body: val.text,
+                            icon: "logo.png"
+                        });
+                    }
+                    lastAnnouncement = val.text;
+                }
             });
 
-            // استماع لتاسكات العضو ده بس
+            // الاستماع لتاسكات العضو
             db.ref('tasks').on('value', snap => {
                 const tasks = snap.val();
                 const container = document.getElementById('userTasksContainer');
