@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dev Zone - كابينة القيادة والإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #050a04;
+            --card-bg: rgba(10, 20, 9, 0.85);
+            --card-border: rgba(180, 255, 59, 0.3);
+            --accent-neon: #b4ff3b;
+            --neon-glow: rgba(180, 255, 59, 0.5);
+            --text-main: #f5fcf0;
+            --text-muted: #8fae85;
+            --danger: #ff4757;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; position: relative; }
+        
+        .bg-watermark {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75vw; max-width: 550px; opacity: 0.12; pointer-events: none; z-index: 0;
+            filter: drop-shadow(0 0 35px var(--neon-glow));
+        }
+
+        /* قفل الأمان للأدمن */
+        .lock-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10; position: relative; }
+        .lock-box { background: var(--card-bg); border: 1px solid var(--accent-neon); border-radius: 20px; padding: 35px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 30px var(--neon-glow); backdrop-filter: blur(20px); }
+        .lock-box img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--accent-neon)); }
+
+        .admin-view { display: none; z-index: 1; position: relative; }
+        header { width: 100%; padding: 18px 35px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); background: rgba(5, 10, 4, 0.95); backdrop-filter: blur(15px); }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 10px var(--accent-neon)); }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
+        @media (max-width: 850px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 25px; backdrop-filter: blur(15px); }
+        .card-title { font-size: 18px; font-weight: 800; color: var(--accent-neon); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+
+        .form-control { width: 100%; padding: 12px 16px; background: rgba(3, 7, 2, 0.9); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px; }
+        .form-control:focus { border-color: var(--accent-neon); box-shadow: 0 0 12px var(--neon-glow); }
+        .btn-neon { width: 100%; padding: 12px; background: linear-gradient(90deg, #4d8000, var(--accent-neon)); border: none; border-radius: 10px; color: #000; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 0 18px var(--neon-glow); }
+
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th, td { padding: 14px; border-bottom: 1px solid var(--card-border); font-size: 14px; }
+        th { color: var(--text-muted); background: rgba(0,0,0,0.3); }
+        .btn-del { background: rgba(255, 71, 87, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <img src="logo.png" class="bg-watermark" alt="Logo Watermark">
+
+    <!-- قفل الأدمن -->
+    <div id="lockScreen" class="lock-screen">
+        <div class="lock-box">
+            <img src="logo.png" alt="Admin">
+            <h2 style="color: #fff; margin-bottom: 6px;">The Dev Zone</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">بوابة الإدارة والتحكم الشامل للمالك</p>
+            <input type="password" id="adminPass" class="form-control" placeholder="اكتب رمز الدخول السري" style="text-align: center;">
+            <button onclick="checkAdminPass()" class="btn-neon"><i class="fa-solid fa-unlock"></i> فتح لوحة القيادة</button>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="adminView" class="admin-view">
+        <header>
+            <div class="brand">
+                <img src="logo.png" alt="Logo">
+                <h3 style="color: #fff;">كابينة قيادة The Dev Zone</h3>
+            </div>
+            <button onclick="location.reload()" class="btn-del" style="padding: 8px 14px; font-size: 13px;"><i class="fa-solid fa-lock"></i> قفل اللوحة</button>
+        </header>
+
+        <div class="container">
+            <div class="grid-2">
+                <!-- 1. إرسال إشعار عام للشباب -->
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-bullhorn"></i> نشر إشعار وتنبيه للشباب جميعاً</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">الإشعار ده هيظهر في نفس الثانية في السايت بتاع الشباب فوق:</p>
+                    <input type="text" id="inputAnnouncement" class="form-control" placeholder="اكتب التنبيه (مثلاً: اجتماع بكرة الساعة 5 م)">
+                    <button onclick="publishAnnouncement()" class="btn-neon"><i class="fa-solid fa-paper-plane"></i> نشر الإشعار فوراً</button>
+                </div>
+
+                <!-- 2. إسناد تاسك لشخص محدد ومتابعة تنفيذه -->
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-user-tag"></i> تعيين تاسك لشخص محدد فقط</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">التاسك هيظهر عنده هو لوحده فقط لما يسجل بإيميله:</p>
+                    <input type="email" id="taskEmail" class="form-control" placeholder="إيميل العضو (مثال: ahmed@gmail.com)">
+                    <input type="text" id="taskText" class="form-control" placeholder="المهمة المطلوبة منه بالتفصيل">
+                    <button onclick="assignTask()" class="btn-neon"><i class="fa-solid fa-plus"></i> إرسال التاسك له</button>
+                </div>
+            </div>
+
+            <!-- 3. جدول مراقبة ومتابعة الشباب المباشر -->
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="card-title"><i class="fa-solid fa-tasks"></i> متابعة حالة المهام والتكليفات (مين خلص ومين لسه)</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>إيميل العضو</th>
+                                <th>نص المهمة</th>
+                                <th>حالة التنفيذ</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksAdminTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. سجل حضور الشباب المباشر -->
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-users"></i> سجل حضور الشباب في الموقع لحظة بلحظة</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>التاريخ</th>
+                                <th>وقت الدخول</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceAdminTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Connection -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkL8BU8_9RfxvphiaKd1pg05dNKHT-yeE",
+            authDomain: "the-dev-zone.firebaseapp.com",
+            databaseURL: "https://the-dev-zone-default-rtdb.firebaseio.com",
+            projectId: "the-dev-zone",
+            storageBucket: "the-dev-zone.firebasestorage.app",
+            messagingSenderId: "748813193113",
+            appId: "1:748813193113:web:ec0b14ba50e98e65e54d08"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // باسورد الأدمن السري (تقدر تغيره في أي وقت من هنا)
+        const ADMIN_SECRET = "1234";
+
+        function checkAdminPass() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === ADMIN_SECRET) {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                startAdminSync();
+            } else {
+                alert('الباسورد غير صحيح!');
+            }
+        }
+
+        function startAdminSync() {
+            // مزامنة الحضور اللحظية
+            db.ref('attendance_logs').on('value', snap => {
+                const logs = snap.val();
+                const tbody = document.getElementById('attendanceAdminTbody');
+                tbody.innerHTML = '';
+                if (logs) {
+                    Object.keys(logs).reverse().forEach(key => {
+                        const row = logs[key];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="font-weight: 700;">${row.name}</td>
+                            <td style="color: var(--accent-neon);">${row.email}</td>
+                            <td>${row.date}</td>
+                            <td>${row.time}</td>
+                            <td><button onclick="db.ref('attendance_logs/${key}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i> مسح</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">مفيش حد سجل حضور لسه.</td></tr>';
+                }
+            });
+
+            // مزامنة المهام والتاسكات لمعرفة مين خلص
+            db.ref('tasks').on('value', snap => {
+                const tasks = snap.val();
+                const tbody = document.getElementById('tasksAdminTbody');
+                tbody.innerHTML = '';
+                if (tasks) {
+                    Object.keys(tasks).reverse().forEach(key => {
+                        const t = tasks[key];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="color: var(--accent-neon); font-weight:600;">${t.targetEmail}</td>
+                            <td>${t.text}</td>
+                            <td>${t.done ? '<span style="color: var(--accent-neon);"><i class="fa-solid fa-circle-check"></i> العضو خلصها</span>' : '<span style="color: #ff9f43;"><i class="fa-solid fa-hourglass-half"></i> قيد التنفيذ</span>'}</td>
+                            <td><button onclick="db.ref('tasks/${key}').remove()" class="btn-del"><i class="fa-solid fa-trash"></i> حذف</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">مفيش تاسكات مبعوتة حالياً.</td></tr>';
+                }
+            });
+        }
+
+        async function publishAnnouncement() {
+            const val = document.getElementById('inputAnnouncement').value.trim();
+            if (val) {
+                await db.ref('system_announcement').set({ text: val });
+                alert('تم نشر الإشعار في موقع الشباب بنجاح!');
+                document.getElementById('inputAnnouncement').value = '';
+            }
+        }
+
+        async function assignTask() {
+            const email = document.getElementById('taskEmail').value.trim().toLowerCase();
+            const text = document.getElementById('taskText').value.trim();
+            if (email && text) {
+                await db.ref('tasks').push({
+                    targetEmail: email,
+                    text: text,
+                    done: false,
+                    assignedAt: new Date().toISOString()
+                });
+                alert('تم إرسال التاسك لإيميل ' + email + ' بنجاح!');
+                document.getElementById('taskText').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
